@@ -1,0 +1,23 @@
+{
+  "fetched_at": "2026-11-24T15:43:32",
+  "last_complete_month": "2026-10",
+  "target_month": "2026-11",
+  "gold_close_last_month": 4105.0,
+  "prob_up": 0.187,
+  "prob_up_logistic": 0.113,
+  "prob_up_gbm": 0.261,
+  "signal": "观望",
+  "confidence": 0.626,
+  "data_stale": false,
+  "train_samples": 234,
+  "macro_snapshot": {
+    "real_rate": 0.97,
+    "d_real_rate_3m": 0.22,
+    "cpi_yoy": 4.02,
+    "unrate": 4.2,
+    "vix": 15.78,
+    "dxy_ret_12m": -0.68,
+    "gold_mom_12m": 17.75
+  },
+  "published_at": "2026-11-24T20:09:42"
+}
