@@ -1,0 +1,60 @@
+{
+  "oos2012": {
+    "price_only": {
+      "total": 0.348,
+      "ann": 0.02,
+      "mdd": -0.041,
+      "sharpe": 0.475,
+      "dir_acc": 0.542
+    },
+    "macro75": {
+      "total": 1.025,
+      "ann": 0.05,
+      "mdd": -0.264,
+      "sharpe": 0.487,
+      "dir_acc": 0.509
+    },
+    "macro_full": {
+      "total": 1.247,
+      "ann": 0.099,
+      "mdd": -0.146,
+      "sharpe": 0.962,
+      "dir_acc": 0.563
+    },
+    "BuyHold": {
+      "total": 1.433,
+      "ann": 0.063,
+      "mdd": -0.384,
+      "sharpe": 0.511
+    }
+  },
+  "last48": {
+    "price_only": {
+      "total": 0.309,
+      "ann": 0.071,
+      "mdd": -0.022,
+      "sharpe": 0.967,
+      "dir_acc": 0.489
+    },
+    "macro75": {
+      "total": 1.139,
+      "ann": 0.225,
+      "mdd": -0.161,
+      "sharpe": 1.671,
+      "dir_acc": 0.622
+    },
+    "macro_full": {
+      "total": 0.911,
+      "ann": 0.188,
+      "mdd": -0.102,
+      "sharpe": 1.564,
+      "dir_acc": 0.578
+    },
+    "BuyHold": {
+      "total": 1.333,
+      "ann": 0.254,
+      "mdd": -0.161,
+      "sharpe": 1.785
+    }
+  }
+}
