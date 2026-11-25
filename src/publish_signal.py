@@ -74,15 +74,16 @@ def main():
         "每月 4 日（北京时间）由自动化任务生成并提交，commit 时间戳即发布时间，不可篡改。",
         "信号针对**当月**金价方向（看多/观望），次月数据公布后回填实际结果。",
         "",
-        "| 信号月份 | 发布时间 | 信号 | 上涨概率 | 实际涨跌 | 是否命中 |",
-        "|---|---|---|---|---|---|",
+        "| 信号月份 | 发布时间 | 信号 | 上涨概率 | 建议仓位 | 实际涨跌 | 是否命中 |",
+        "|---|---|---|---|---|---|---|",
     ]
     for rec in records:
         actual = f"{rec['actual_return_pct']:+.2f}%" if "actual_return_pct" in rec else "待公布"
         hit = ("✅" if rec["hit"] else "❌") if "hit" in rec else "—"
+        pos = f"{rec['position_pct']:.0%}" if "position_pct" in rec else "—"
         pub = rec.get("published_at", "")[:10]
         lines.append(f"| {rec['target_month']} | {pub} | {rec['signal']} | "
-                     f"{rec['prob_up']:.1%} | {actual} | {hit} |")
+                     f"{rec['prob_up']:.1%} | {pos} | {actual} | {hit} |")
     lines.append("")
     if settled:
         lines.append(f"**累计已结算 {settled} 期，命中 {hits} 期，命中率 {hits/settled:.1%}**"

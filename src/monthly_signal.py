@@ -193,6 +193,14 @@ def main():
     signal = "看多" if prob > 0.5 else "观望"
     confidence = abs(prob - 0.5) * 2  # 0~1
 
+    # 建议仓位 = 概率强度 × 波动率目标（回测验证：夏普 1.12 vs 0/1 开关 1.00）
+    # 概率强度：prob<=0.5 → 0，prob>=0.65 → 1，线性过渡
+    pos_strength = float(np.clip((prob - 0.50) / 0.15, 0, 1))
+    # 波动率目标：目标年化波动 12%，无杠杆（上限 1）
+    vol_12_ann = float(full["vol_12"].iloc[-1] * np.sqrt(12))
+    vol_scalar = float(min(1.0, 0.12 / vol_12_ann)) if vol_12_ann > 0 else 0.0
+    position_pct = round(pos_strength * vol_scalar, 3)
+
     row = full.iloc[-1]
     result = {
         "fetched_at": fetched_at,
@@ -204,6 +212,13 @@ def main():
         "prob_up_gbm": round(p2, 3),
         "signal": signal,
         "confidence": round(confidence, 3),
+        "position_pct": position_pct,
+        "position_detail": {
+            "prob_strength": round(pos_strength, 3),
+            "vol_12m_annualized": round(vol_12_ann, 3),
+            "vol_scalar": round(vol_scalar, 3),
+            "rule": "position = clip((prob-0.5)/0.15, 0, 1) * min(1, 0.12/vol_12m_ann)",
+        },
         "data_stale": bool(stale),
         "train_samples": int(len(train)),
         "macro_snapshot": {
@@ -222,6 +237,7 @@ def main():
     print("\n===== 黄金月度信号 =====")
     print(f"基于截至 {result['last_complete_month']} 的完整数据，预测 {result['target_month']} 月方向")
     print(f"信号：{signal}（上涨概率 {prob:.1%}，置信度 {confidence:.1%}）")
+    print(f"建议仓位：{position_pct:.0%}（概率强度 {pos_strength:.2f} × 波动率系数 {vol_scalar:.2f}）")
     if stale:
         print(f"⚠️ 金价历史停留在 {result['last_complete_month']}，距当前超过1个月，请先补充 gold_monthly_local.csv")
     print(f"宏观快照：实际利率 {result['macro_snapshot']['real_rate']}%，"
