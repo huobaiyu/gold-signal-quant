@@ -1,13 +1,20 @@
 {
-  "fetched_at": "2026-11-25T08:39:30",
+  "fetched_at": "2026-11-25T13:43:32",
   "last_complete_month": "2026-10",
   "target_month": "2026-11",
   "gold_close_last_month": 4105.0,
-  "prob_up": 0.187,
-  "prob_up_logistic": 0.113,
-  "prob_up_gbm": 0.261,
+  "prob_up": 0.176,
+  "prob_up_logistic": 0.133,
+  "prob_up_gbm": 0.218,
   "signal": "观望",
-  "confidence": 0.626,
+  "confidence": 0.648,
+  "position_pct": 0.0,
+  "position_detail": {
+    "prob_strength": 0.0,
+    "vol_12m_annualized": 0.2,
+    "vol_scalar": 0.601,
+    "rule": "position = clip((prob-0.5)/0.15, 0, 1) * min(1, 0.12/vol_12m_ann)"
+  },
   "data_stale": false,
   "train_samples": 234,
   "macro_snapshot": {
@@ -19,5 +26,5 @@
     "dxy_ret_12m": -0.68,
     "gold_mom_12m": 17.75
   },
-  "published_at": "2026-11-25T08:41:24"
+  "published_at": "2026-11-25T13:45:19"
 }
