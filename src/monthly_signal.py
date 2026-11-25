@@ -92,6 +92,43 @@ def load_gold() -> pd.Series:
     return base
 
 
+def load_cot() -> pd.Series:
+    """读取 CFTC 黄金非商业净持仓（占未平仓比）；若缓存超过35天未更新，
+    下载本年度 CFTC 文件增量合并。"""
+    import zipfile
+    path = Path(WS) / "data" / "cot_gold_weekly.csv"
+    cot = pd.read_csv(path, parse_dates=["date"]).set_index("date")
+    if (pd.Timestamp.now() - cot.index[-1]).days > 35:
+        try:
+            year = pd.Timestamp.now().year
+            url = f"https://www.cftc.gov/files/dea/history/deacot{year}.zip"
+            raw = subprocess.run(["curl", "-sL", "--max-time", "90", url],
+                                 capture_output=True, timeout=100).stdout
+            z = zipfile.ZipFile(io.BytesIO(raw))
+            df = pd.read_csv(z.open(z.namelist()[0]), low_memory=False)
+            gold = df[df["Market and Exchange Names"].str.strip()
+                      == "GOLD - COMMODITY EXCHANGE INC."]
+            cols = {"As of Date in Form YYYY-MM-DD": "date",
+                    "Open Interest (All)": "oi",
+                    "Noncommercial Positions-Long (All)": "nc_long",
+                    "Noncommercial Positions-Short (All)": "nc_short",
+                    "Commercial Positions-Long (All)": "c_long",
+                    "Commercial Positions-Short (All)": "c_short"}
+            gold = gold.rename(columns=cols)[list(cols.values())]
+            gold["date"] = pd.to_datetime(gold["date"])
+            gold = gold.set_index("date")
+            cot = pd.concat([cot[~cot.index.isin(gold.index)], gold]).sort_index()
+            for c in ("oi", "nc_long", "nc_short", "c_long", "c_short"):
+                cot[c] = pd.to_numeric(cot[c], errors="coerce")
+            cot["nc_net"] = cot["nc_long"] - cot["nc_short"]
+            cot["nc_net_pct_oi"] = cot["nc_net"] / cot["oi"]
+            cot.to_csv(path)
+            print(f"  COT 持仓：已更新至 {cot.index[-1].date()}")
+        except Exception as e:  # noqa: BLE001
+            print(f"  COT 持仓更新失败（{e}），使用缓存")
+    return cot["nc_net_pct_oi"].resample("MS").last()
+
+
 def main():
     fetched_at = datetime.now().isoformat(timespec="seconds")
     print("正在更新宏观数据（FRED）...")
@@ -121,7 +158,11 @@ def main():
         "vix": fred["vix"],
         "d_vix_3m": fred["vix"].diff(3),
         "dxy_ret_12m": fred["dxy"].pct_change(12),
-    }).shift(1)  # 宏观特征滞后1个月，模拟发布延迟
+    })
+    cot_m = load_cot()
+    macro["cot_net_pct_oi"] = cot_m
+    macro["d_cot_3m"] = cot_m.diff(3)
+    macro = macro.shift(1)  # 宏观与持仓特征统一滞后1个月，模拟发布延迟
 
     next_ret = r1.shift(-1)
     data = feat.join(macro)
